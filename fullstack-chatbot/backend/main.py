@@ -48,10 +48,10 @@ async def chat(req: ChatRequest):
 # -----------------------------
 # File Upload Endpoint
 # -----------------------------
-@app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    content = await file.read()
-    text = content.decode("utf-8", errors="ignore")
+# @app.post("/upload")
+# async def upload_file(file: UploadFile = File(...)):
+#     content = await file.read()
+#     text = content.decode("utf-8", errors="ignore")
 
-    return {"text": text}
+#     return {"text": text}
    

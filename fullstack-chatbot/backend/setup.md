@@ -23,6 +23,9 @@ http://127.0.0.1:8000/docs
 
 ## More features 
 
+**pip install python-multipart**
+
+# Upload 
 
 React (file upload)
    ↓

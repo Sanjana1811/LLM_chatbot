@@ -11,6 +11,17 @@ const ChatWith: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // 🔊 TEXT → SPEECH FUNCTION (ADD HERE)
+  const speak = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.cancel(); // stop previous speech
+    speechSynthesis.speak(utterance);
+  };
+  // const speak = (text: string) => {
+  //   const utterance = new SpeechSynthesisUtterance(text);
+  //   speechSynthesis.speak(utterance);
+  // };
+
   const sendMessage = async (): Promise<void> => {
     if (!input.trim()) return;
 
@@ -32,6 +43,11 @@ const ChatWith: React.FC = () => {
         ...prev,
         { role: "bot", text: data.reply },
       ]);
+
+      // 🔊 SPEAK BOT RESPONSE
+      // Auto-speak bot reply
+      speak(data.reply);
+
     } catch (error) {
       console.error(error);
       setMessages((prev) => [
@@ -100,6 +116,15 @@ const ChatWith: React.FC = () => {
             }}
           >
             {msg.text}
+            {/* 🔊 SPEAKER BUTTON (BOT ONLY) */}
+            {msg.role === "bot" && (
+              <button
+                onClick={() => speak(msg.text)}
+                style={styles.speakerBtn}
+              >
+                🔊
+              </button>
+            )}
           </div>
         ))}
         {loading && <div style={styles.typing}>Bot is typing...</div>}

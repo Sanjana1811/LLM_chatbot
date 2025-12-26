@@ -1,5 +1,8 @@
 import { useState } from "react";
-import '../assets/css/ChatWith.css'
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import '../assets/css/ChatWith.css';
+import { Send } from "lucide-react";
+
 
 type Message = {
   role: "user" | "bot";
@@ -62,42 +65,42 @@ const ChatWith: React.FC = () => {
 
   // Handle file upload
   const handleFile = async (file?: File) => {
-  if (!file) return;
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const res = await fetch("http://localhost:8000/upload", {
-    method: "POST",
-    body: formData,
-  });
+    const res = await fetch("http://localhost:8000/upload", {
+      method: "POST",
+      body: formData,
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  // Send extracted text to chat
-  setInput(data.text.slice(0, 2000));
-};
+    // Send extracted text to chat
+    setInput(data.text.slice(0, 2000));
+  };
 
   // Dictation feature or voice input
   const startListening = () => {
-  const SpeechRecognition =
-    (window as any).SpeechRecognition ||
-    (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
-  if (!SpeechRecognition) {
-    alert("Speech recognition not supported");
-    return;
-  }
+    if (!SpeechRecognition) {
+      alert("Speech recognition not supported");
+      return;
+    }
 
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.start();
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.start();
 
-  recognition.onresult = (event: any) => {
-    const transcript = event.results[0][0].transcript;
-    setInput(transcript);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(transcript);
+    };
   };
-};
 
 
   return (
@@ -137,15 +140,24 @@ const ChatWith: React.FC = () => {
           placeholder="Type your message..."
           style={styles.input}
         />
-        <button onClick={startListening}>🎤</button>
+        <button onClick={startListening} style={styles.micButton}>
+          <i className="fa fa-microphone"></i>
+        </button>
+
         <input
-  type="file"
-  onChange={(e) => handleFile(e.target.files?.[0])}
-/>
+          type="file"
+          onChange={(e) => handleFile(e.target.files?.[0])}
+        />
+
+        {/* <button onClick={sendMessage} style={styles.iconButton}>
+          <i className="fa fa-send-o" style={{ fontSize: "24px" }}></i>
+        </button> */}
 
         <button onClick={sendMessage} style={styles.button}>
-          Send
+          Send <Send size={20} />
         </button>
+
+
       </div>
     </div>
   );
@@ -192,7 +204,29 @@ const styles: Styles = {
   button: {
     padding: "10px 16px",
     cursor: "pointer",
+    background: "transparent",
+    border: "none",
   },
+  micButton: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    color: "#333",
+    fontSize: "20px",
+  },
+  sendButton: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "10px 16px",
+    cursor: "pointer",
+  },
+  iconButton: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+  }
+
 };
 
 export default ChatWith;

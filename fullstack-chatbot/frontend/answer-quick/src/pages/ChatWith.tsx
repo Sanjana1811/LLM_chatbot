@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import '../assets/css/ChatWith.css'
 
 type Message = {
   role: "user" | "bot";
@@ -46,7 +46,8 @@ const ChatWith: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <h2>💬 AI Chatbot</h2>
+      <h2>Anahita 💬 AI Assistant</h2>
+      <h6>Your friendly brain on demand</h6>
 
       <div style={styles.chatBox}>
         {messages.map((msg, idx) => (

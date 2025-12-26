@@ -44,6 +44,46 @@ const ChatWith: React.FC = () => {
     setLoading(false);
   };
 
+  // Handle file upload
+  const handleFile = async (file?: File) => {
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("http://localhost:8000/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  // Send extracted text to chat
+  setInput(data.text.slice(0, 2000));
+};
+
+  // Dictation feature or voice input
+  const startListening = () => {
+  const SpeechRecognition =
+    (window as any).SpeechRecognition ||
+    (window as any).webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Speech recognition not supported");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.start();
+
+  recognition.onresult = (event: any) => {
+    const transcript = event.results[0][0].transcript;
+    setInput(transcript);
+  };
+};
+
+
   return (
     <div style={styles.container}>
       <h2>Anahita 💬 AI Assistant</h2>
@@ -72,6 +112,12 @@ const ChatWith: React.FC = () => {
           placeholder="Type your message..."
           style={styles.input}
         />
+        <button onClick={startListening}>🎤</button>
+        <input
+  type="file"
+  onChange={(e) => handleFile(e.target.files?.[0])}
+/>
+
         <button onClick={sendMessage} style={styles.button}>
           Send
         </button>

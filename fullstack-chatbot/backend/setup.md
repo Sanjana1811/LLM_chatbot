@@ -21,3 +21,19 @@ http://127.0.0.1:8000/docs
 
 
 
+## More features 
+
+
+React (file upload)
+   ↓
+FastAPI (extract text)
+   ↓
+Groq (analyze text)
+
+**pip install pypdf python-docx**
+
+if file.filename.endswith(".pdf"):
+    # extract with pypdf
+elif file.filename.endswith(".docx"):
+    # extract with python-docx
+

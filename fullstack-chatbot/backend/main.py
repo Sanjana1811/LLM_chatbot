@@ -45,17 +45,13 @@ async def chat(req: ChatRequest):
 
     return {"reply": response.choices[0].message.content}
 
-from fastapi import UploadFile, File
-
+# -----------------------------
+# File Upload Endpoint
+# -----------------------------
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     content = await file.read()
     text = content.decode("utf-8", errors="ignore")
 
     return {"text": text}
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {"role": "user", "content": text}
-        ],
-    )
+   

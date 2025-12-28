@@ -1,12 +1,10 @@
 import { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "../assets/css/ChatWith.css";
+import '../assets/css/ChatWith.css';
 import { Send } from "lucide-react";
-import { Copy } from "lucide-react";
-import { nanoid } from "nanoid";
+
 
 type Message = {
-  id: string;
   role: "user" | "bot";
   text: string;
 };
@@ -16,45 +14,22 @@ const ChatWith: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // 🔊 TEXT → SPEECH
+  // 🔊 TEXT → SPEECH FUNCTION (ADD HERE)
   const speak = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
-    speechSynthesis.cancel();
+    speechSynthesis.cancel(); // stop previous speech
     speechSynthesis.speak(utterance);
   };
+  // const speak = (text: string) => {
+  //   const utterance = new SpeechSynthesisUtterance(text);
+  //   speechSynthesis.speak(utterance);
+  // };
 
-  // 📋 COPY
-  const copyMessage = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  // 🗑 DELETE (LOCAL)
-  const deleteMessage = (id: string) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== id));
-  };
-
-  // 🔗 SHARE
-  const shareMessage = async (text: string) => {
-    if (navigator.share) {
-      await navigator.share({
-        title: "Anahita AI",
-        text,
-      });
-    } else {
-      copyMessage(text);
-      alert("Copied to clipboard!");
-    }
-  };
-
-  // 📤 SEND MESSAGE
   const sendMessage = async (): Promise<void> => {
     if (!input.trim()) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { id: nanoid(), role: "user", text: input },
-    ]);
-
+    // Add user message
+    setMessages((prev) => [...prev, { role: "user", text: input }]);
     setLoading(true);
 
     try {
@@ -66,20 +41,21 @@ const ChatWith: React.FC = () => {
 
       const data: { reply: string } = await res.json();
 
+      // Add bot reply
       setMessages((prev) => [
         ...prev,
-        { id: nanoid(), role: "bot", text: data.reply },
+        { role: "bot", text: data.reply },
       ]);
 
+      // 🔊 SPEAK BOT RESPONSE
+      // Auto-speak bot reply
       speak(data.reply);
+
     } catch (error) {
+      console.error(error);
       setMessages((prev) => [
         ...prev,
-        {
-          id: nanoid(),
-          role: "bot",
-          text: "⚠️ Error connecting to server.",
-        },
+        { role: "bot", text: "Error connecting to server." },
       ]);
     }
 
@@ -87,7 +63,7 @@ const ChatWith: React.FC = () => {
     setLoading(false);
   };
 
-  // 📄 FILE UPLOAD
+  // Handle file upload
   const handleFile = async (file?: File) => {
     if (!file) return;
 
@@ -100,10 +76,12 @@ const ChatWith: React.FC = () => {
     });
 
     const data = await res.json();
+
+    // Send extracted text to chat
     setInput(data.text.slice(0, 2000));
   };
 
-  // 🎤 SPEECH TO TEXT
+  // Dictation feature or voice input
   const startListening = () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -119,9 +97,11 @@ const ChatWith: React.FC = () => {
     recognition.start();
 
     recognition.onresult = (event: any) => {
-      setInput(event.results[0][0].transcript);
+      const transcript = event.results[0][0].transcript;
+      setInput(transcript);
     };
   };
+
 
   return (
     <div style={styles.container}>
@@ -129,9 +109,9 @@ const ChatWith: React.FC = () => {
       <h6>Your friendly brain on demand</h6>
 
       <div style={styles.chatBox}>
-        {messages.map((msg) => (
+        {messages.map((msg, idx) => (
           <div
-            key={msg.id}
+            key={idx}
             style={{
               ...styles.message,
               alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
@@ -139,25 +119,17 @@ const ChatWith: React.FC = () => {
             }}
           >
             {msg.text}
-
-            {/* msg.role === "bot" && */ (
-              <div style={styles.actionRow}>
-                <button onClick={() => speak(msg.text)}>🔊</button>
-                {/* <button onClick={() => copyMessage(msg.text)} title="Copy">
-                  <Copy size={16} />
-                </button> */}
-                <button onClick={() => copyMessage(msg.text)} title="Copy">
-                  <i className="fa-solid fa-copy"></i>
-                </button>
-
-
-                <button onClick={() => shareMessage(msg.text)}>🔗</button>
-                <button onClick={() => deleteMessage(msg.id)}>🗑</button>
-              </div>
+            {/* 🔊 SPEAKER BUTTON (BOT ONLY) */}
+            {msg.role === "bot" && (
+              <button
+                onClick={() => speak(msg.text)}
+                style={styles.speakerBtn}
+              >
+                🔊
+              </button>
             )}
           </div>
         ))}
-
         {loading && <div style={styles.typing}>Bot is typing...</div>}
       </div>
 
@@ -168,8 +140,7 @@ const ChatWith: React.FC = () => {
           placeholder="Type your message..."
           style={styles.input}
         />
-
-        <button onClick={startListening} style={styles.iconButton}>
+        <button onClick={startListening} style={styles.micButton}>
           <i className="fa fa-microphone"></i>
         </button>
 
@@ -178,9 +149,15 @@ const ChatWith: React.FC = () => {
           onChange={(e) => handleFile(e.target.files?.[0])}
         />
 
-        <button onClick={sendMessage} style={styles.sendButton}>
-          Send <Send size={18} />
+        {/* <button onClick={sendMessage} style={styles.iconButton}>
+          <i className="fa fa-send-o" style={{ fontSize: "24px" }}></i>
+        </button> */}
+
+        <button onClick={sendMessage} style={styles.button}>
+          Send <Send size={20} />
         </button>
+
+
       </div>
     </div>
   );
@@ -211,11 +188,6 @@ const styles: Styles = {
     borderRadius: "10px",
     maxWidth: "80%",
   },
-  actionRow: {
-    display: "flex",
-    gap: "6px",
-    marginTop: "6px",
-  },
   typing: {
     fontStyle: "italic",
     color: "gray",
@@ -229,23 +201,32 @@ const styles: Styles = {
     flex: 1,
     padding: "10px",
   },
-  sendButton: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
+  button: {
     padding: "10px 16px",
     cursor: "pointer",
+    background: "transparent",
     border: "none",
-    background: "#4CAF50",
-    color: "#fff",
-    borderRadius: "4px",
   },
-  iconButton: {
+  micButton: {
     background: "transparent",
     border: "none",
     cursor: "pointer",
+    color: "#333",
     fontSize: "20px",
   },
+  sendButton: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "10px 16px",
+    cursor: "pointer",
+  },
+  iconButton: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+  }
+
 };
 
 export default ChatWith;

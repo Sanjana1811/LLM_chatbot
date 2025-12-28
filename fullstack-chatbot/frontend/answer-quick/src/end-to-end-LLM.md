@@ -28,3 +28,13 @@ React (file upload)
 FastAPI (extract text)
    ↓
 Groq (analyze text)
+
+
+React UI
+  └── role = "user" | "bot"   (UI only)
+
+FastAPI Backend
+  └── role = "system" | "user" | "assistant" (LLM logic)
+
+Groq API
+

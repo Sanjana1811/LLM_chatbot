@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,24 +19,27 @@ const ChatWith: React.FC = () => {
   // 🔊 Speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  /* ---------------- LOAD VOICES ---------------- */
+  /* ----------------------------------
+     LOAD AVAILABLE VOICES (IMPORTANT)
+  -----------------------------------*/
   useEffect(() => {
     const loadVoices = () => {
-      setVoices(window.speechSynthesis.getVoices());
+      const availableVoices = window.speechSynthesis.getVoices();
+      setVoices(availableVoices);
     };
 
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
-  /* ---------------- TEXT → SPEECH ---------------- */
+  /* ----------------------------------
+     TEXT → SPEECH (FEMALE VOICE)
+  -----------------------------------*/
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
 
     // Anahita's voice
     const femaleVoice =
@@ -50,40 +53,29 @@ const ChatWith: React.FC = () => {
     }
 
     utterance.lang = "en-US";
-    utterance.pitch = 1.2;
-    utterance.rate = 1;
+    utterance.pitch = 1.2; // slightly higher → feminine
+    utterance.rate = 1;    // natural speed
 
     utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      utteranceRef.current = null;
-    };
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      utteranceRef.current = null;
-    };
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
 
     window.speechSynthesis.speak(utterance);
   };
 
-  /* ---------------- STOP SPEAKING ---------------- */
   const stopSpeaking = () => {
     window.speechSynthesis.cancel();
-    utteranceRef.current = null;
     setIsSpeaking(false);
   };
 
-  /* ---------------- COPY ---------------- */
   const copyMessage = (text: string) => {
     navigator.clipboard.writeText(text);
   };
 
-  /* ---------------- DELETE ---------------- */
   const deleteMessage = (id: string) => {
     setMessages(prev => prev.filter(msg => msg.id !== id));
   };
 
-  /* ---------------- SHARE ---------------- */
   const shareMessage = async (text: string) => {
     if (navigator.share) {
       await navigator.share({ title: "Anahita AI", text });
@@ -93,7 +85,9 @@ const ChatWith: React.FC = () => {
     }
   };
 
-  /* ---------------- SEND MESSAGE ---------------- */
+  /* ----------------------------------
+     SEND MESSAGE
+  -----------------------------------*/
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -134,7 +128,9 @@ const ChatWith: React.FC = () => {
     setLoading(false);
   };
 
-  /* ---------------- SPEECH → TEXT ---------------- */
+  /* ----------------------------------
+     SPEECH → TEXT
+  -----------------------------------*/
   const startListening = () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -152,22 +148,6 @@ const ChatWith: React.FC = () => {
     recognition.onresult = (event: any) => {
       setInput(event.results[0][0].transcript);
     };
-  };
-
-  /* ---------------- FILE UPLOAD ---------------- */
-  const handleFile = async (file?: File) => {
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("http://localhost:8000/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    setInput(data.text.slice(0, 2000));
   };
 
   return (
@@ -212,40 +192,24 @@ const ChatWith: React.FC = () => {
             </ReactMarkdown>
 
             <div style={styles.actionRow}>
-              {/* 🔘 SPEAK / STOP TOGGLE */}
               <button
-                onClick={() => {
-                  if (isSpeaking) stopSpeaking();
-                  else speak(msg.text);
-                }}
-                title={isSpeaking ? "Stop speaking" : "Speak"}
+                onClick={() => speak(msg.text)}
+                onDoubleClick={stopSpeaking}
                 style={styles.iconButton}
               >
-                <i
-                  className={`fa-solid ${isSpeaking ? "fa-volume-xmark" : "fa-volume-high"
-                    }`}
-                />
+                <i className={`fa-solid ${isSpeaking ? "fa-volume-xmark" : "fa-volume-high"}`} />
               </button>
 
-              <button
-                onClick={() => copyMessage(msg.text)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-copy"></i>
+              <button onClick={() => copyMessage(msg.text)} style={styles.iconButton}>
+                <i className="fa-solid fa-copy" />
               </button>
 
-              <button
-                onClick={() => shareMessage(msg.text)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-share-nodes"></i>
+              <button onClick={() => shareMessage(msg.text)} style={styles.iconButton}>
+                <i className="fa-solid fa-share-nodes" />
               </button>
 
-              <button
-                onClick={() => deleteMessage(msg.id)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-trash"></i>
+              <button onClick={() => deleteMessage(msg.id)} style={styles.iconButton}>
+                <i className="fa-solid fa-trash" />
               </button>
             </div>
           </div>
@@ -263,10 +227,8 @@ const ChatWith: React.FC = () => {
         />
 
         <button onClick={startListening} style={styles.iconButton}>
-          <i className="fa-solid fa-microphone"></i>
+          <i className="fa-solid fa-microphone" />
         </button>
-
-        <input type="file" onChange={e => handleFile(e.target.files?.[0])} />
 
         <button onClick={sendMessage} style={styles.sendButton}>
           Send <Send size={18} />
@@ -276,13 +238,11 @@ const ChatWith: React.FC = () => {
   );
 };
 
-/* ---------------- STYLES ---------------- */
+/* ----------------------------------
+   STYLES
+-----------------------------------*/
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: "600px",
-    margin: "40px auto",
-    fontFamily: "Arial, sans-serif",
-  },
+  container: { maxWidth: "600px", margin: "40px auto", fontFamily: "Arial" },
   chatBox: {
     border: "1px solid #ccc",
     borderRadius: "8px",
@@ -293,46 +253,23 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: "8px",
   },
-  message: {
-    padding: "8px 12px",
-    borderRadius: "10px",
-    maxWidth: "80%",
-  },
-  actionRow: {
-    display: "flex",
-    gap: "8px",
-    marginTop: "6px",
-  },
-  typing: {
-    fontStyle: "italic",
-    color: "gray",
-  },
-  inputRow: {
-    display: "flex",
-    marginTop: "10px",
-    gap: "10px",
-  },
-  input: {
-    flex: 1,
-    padding: "10px",
-  },
+  message: { padding: "8px 12px", borderRadius: "10px", maxWidth: "80%" },
+  actionRow: { display: "flex", gap: "8px", marginTop: "6px" },
+  typing: { fontStyle: "italic", color: "gray" },
+  inputRow: { display: "flex", marginTop: "10px", gap: "10px" },
+  input: { flex: 1, padding: "10px" },
   sendButton: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
     padding: "10px 16px",
-    cursor: "pointer",
-    border: "none",
     background: "#4CAF50",
     color: "#fff",
-    borderRadius: "4px",
-  },
-  iconButton: {
-    background: "transparent",
     border: "none",
+    borderRadius: "4px",
     cursor: "pointer",
-    fontSize: "18px",
   },
+  iconButton: { background: "transparent", border: "none", cursor: "pointer" },
 };
 
 export default ChatWith;

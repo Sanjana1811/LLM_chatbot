@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -16,74 +16,39 @@ const ChatWith: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔊 Speech state
+  // Speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  /* ---------------- LOAD VOICES ---------------- */
-  useEffect(() => {
-    const loadVoices = () => {
-      setVoices(window.speechSynthesis.getVoices());
-    };
-
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-  }, []);
-
-  /* ---------------- TEXT → SPEECH ---------------- */
+  // TEXT → SPEECH
   const speak = (text: string) => {
-    window.speechSynthesis.cancel();
+    speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
-
-    // Anahita's voice
-    const femaleVoice =
-      voices.find(v => v.name.includes("Google UK English Female")) ||
-      voices.find(v => v.name.includes("Microsoft Zira")) ||
-      voices.find(v => v.name.toLowerCase().includes("female")) ||
-      voices.find(v => v.name.toLowerCase().includes("woman"));
-
-    if (femaleVoice) {
-      utterance.voice = femaleVoice;
-    }
-
-    utterance.lang = "en-US";
-    utterance.pitch = 1.2;
-    utterance.rate = 1;
 
     utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      utteranceRef.current = null;
-    };
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      utteranceRef.current = null;
-    };
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
 
-    window.speechSynthesis.speak(utterance);
+    speechSynthesis.speak(utterance);
   };
 
-  /* ---------------- STOP SPEAKING ---------------- */
+  // STOP SPEAKING
   const stopSpeaking = () => {
-    window.speechSynthesis.cancel();
-    utteranceRef.current = null;
+    speechSynthesis.cancel();
     setIsSpeaking(false);
   };
 
-  /* ---------------- COPY ---------------- */
+  // COPY
   const copyMessage = (text: string) => {
     navigator.clipboard.writeText(text);
   };
 
-  /* ---------------- DELETE ---------------- */
+  // DELETE (LOCAL)
   const deleteMessage = (id: string) => {
-    setMessages(prev => prev.filter(msg => msg.id !== id));
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
   };
 
-  /* ---------------- SHARE ---------------- */
+  // SHARE
   const shareMessage = async (text: string) => {
     if (navigator.share) {
       await navigator.share({ title: "Anahita AI", text });
@@ -93,11 +58,11 @@ const ChatWith: React.FC = () => {
     }
   };
 
-  /* ---------------- SEND MESSAGE ---------------- */
+  // SEND MESSAGE
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
       { id: nanoid(), role: "user", text: input },
     ]);
@@ -113,14 +78,14 @@ const ChatWith: React.FC = () => {
 
       const data: { reply: string } = await res.json();
 
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev,
         { id: nanoid(), role: "bot", text: data.reply },
       ]);
 
       speak(data.reply);
     } catch {
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev,
         {
           id: nanoid(),
@@ -134,7 +99,7 @@ const ChatWith: React.FC = () => {
     setLoading(false);
   };
 
-  /* ---------------- SPEECH → TEXT ---------------- */
+  //  SPEECH → TEXT
   const startListening = () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -154,7 +119,7 @@ const ChatWith: React.FC = () => {
     };
   };
 
-  /* ---------------- FILE UPLOAD ---------------- */
+  //  FILE UPLOAD
   const handleFile = async (file?: File) => {
     if (!file) return;
 
@@ -176,7 +141,7 @@ const ChatWith: React.FC = () => {
       <h6>Your friendly brain on demand</h6>
 
       <div style={styles.chatBox}>
-        {messages.map(msg => (
+        {messages.map((msg) => (
           <div
             key={msg.id}
             style={{
@@ -185,7 +150,9 @@ const ChatWith: React.FC = () => {
               background: msg.role === "user" ? "#DCF8C6" : "#F1F0F0",
             }}
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}
+            {/* {msg.text} */}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
               components={{
                 p: ({ children }) => (
                   <p style={{ margin: "8px 0", lineHeight: "1.6", textAlign: "left" }}>
@@ -211,53 +178,55 @@ const ChatWith: React.FC = () => {
               {msg.text}
             </ReactMarkdown>
 
-            <div style={styles.actionRow}>
-              {/* 🔘 SPEAK / STOP TOGGLE */}
-              <button
-                onClick={() => {
-                  if (isSpeaking) stopSpeaking();
-                  else speak(msg.text);
-                }}
-                title={isSpeaking ? "Stop speaking" : "Speak"}
-                style={styles.iconButton}
-              >
-                <i
-                  className={`fa-solid ${isSpeaking ? "fa-volume-xmark" : "fa-volume-high"
-                    }`}
-                />
-              </button>
 
-              <button
-                onClick={() => copyMessage(msg.text)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-copy"></i>
-              </button>
 
-              <button
-                onClick={() => shareMessage(msg.text)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-share-nodes"></i>
-              </button>
+            {/* msg.role === "bot" && */ (
+              <div style={styles.actionRow}>
+                <button
+                  onClick={() => speak(msg.text)}
+                  onDoubleClick={stopSpeaking}
+                  title="Click to speak, double-click to stop"
+                  style={styles.iconButton}
+                >
+                  {isSpeaking ? (
+                    <i className="fa-solid fa-volume-xmark"></i>
+                  ) : (
+                    <i className="fa-solid fa-volume-high"></i>
+                  )}
+                </button>
 
-              <button
-                onClick={() => deleteMessage(msg.id)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-trash"></i>
-              </button>
-            </div>
+                <button
+                  onClick={() => copyMessage(msg.text)}
+                  style={styles.iconButton}
+                >
+                  <i className="fa-solid fa-copy"></i>
+                </button>
+
+                <button
+                  onClick={() => shareMessage(msg.text)}
+                  style={styles.iconButton}
+                >
+                  <i className="fa-solid fa-share-nodes"></i>
+                </button>
+
+                <button
+                  onClick={() => deleteMessage(msg.id)}
+                  style={styles.iconButton}
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            )}
           </div>
         ))}
 
-        {loading && <div style={styles.typing}>Anahita is thinking…</div>}
+        {loading && <div style={styles.typing}>Bot is typing...</div>}
       </div>
 
       <div style={styles.inputRow}>
         <input
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
           style={styles.input}
         />
@@ -266,7 +235,7 @@ const ChatWith: React.FC = () => {
           <i className="fa-solid fa-microphone"></i>
         </button>
 
-        <input type="file" onChange={e => handleFile(e.target.files?.[0])} />
+        <input type="file" onChange={(e) => handleFile(e.target.files?.[0])} />
 
         <button onClick={sendMessage} style={styles.sendButton}>
           Send <Send size={18} />
@@ -276,7 +245,6 @@ const ChatWith: React.FC = () => {
   );
 };
 
-/* ---------------- STYLES ---------------- */
 const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: "600px",

@@ -56,6 +56,20 @@
   cursor: pointer;
 }
 
+
+.custom-button {
+ margin-bottom : 5rem;
+ margin-left : 76rem;
+ padding: 8px 12px;
+ cursor: pointer;
+ border: none;
+ background: #7e1e80;
+ color: #ffffff;
+ border-radius: 4px;
+}
+
+
+
 /* micButton: {
   background: "transparent",
   border: "none",

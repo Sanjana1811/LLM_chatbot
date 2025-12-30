@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import { Send } from "lucide-react";
 import { nanoid } from "nanoid";
+import '../assets/css/ChatWith.css';
 
 type Message = {
   id: string;
@@ -17,12 +18,12 @@ const ChatWith: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 🔊 Speech state
+  // Speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // 📎 File input ref
+  // File input ref
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   /* ---------------- LOAD VOICES ---------------- */
@@ -175,11 +176,11 @@ const ChatWith: React.FC = () => {
   };
 
   return (
-    <div> 
+    <div>
       {/* somewhere in JSX */}
       <Link to="/feed" style={{ textDecoration: "none" }}>
-        <button style={{ marginBottom: 10 }}>
-          🚀 Open Custom Feed
+        <button className="custom-button" >
+          <i className="fa-solid fa-bahai"></i>
         </button>
       </Link>
       <div style={styles.container}>

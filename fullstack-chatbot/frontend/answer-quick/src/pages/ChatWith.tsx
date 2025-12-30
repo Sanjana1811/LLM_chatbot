@@ -178,8 +178,8 @@ const ChatWith: React.FC = () => {
   return (
     <div>
       {/* somewhere in JSX */}
-      <Link to="/feed" style={{ textDecoration: "none" }}>
-        <button className="custom-button" >
+      <Link to="/feed" className="link-custom-feed">
+        <button className="custom-feed-button" >
           <i className="fa-solid fa-bahai"></i>
         </button>
       </Link>
@@ -325,8 +325,10 @@ const ChatWith: React.FC = () => {
 /* ---------------- STYLES ---------------- */
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: "600px",
-    margin: "40px auto",
+    maxWidth: "800px",
+    margin: "20px auto",
+    fontSize: "16px",
+    textAlign : 'left',
     fontFamily: "Arial, sans-serif",
   },
   chatBox: {

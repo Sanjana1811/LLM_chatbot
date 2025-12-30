@@ -57,8 +57,8 @@
 }
 
 
-.custom-button {
- margin-bottom : 5rem;
+.custom-feed-button {
+ margin-bottom : 1rem;
  margin-left : 76rem;
  padding: 8px 12px;
  cursor: pointer;
@@ -68,7 +68,9 @@
  border-radius: 4px;
 }
 
-
+.link-custom-feed{
+  text-decoration : none;
+}
 
 /* micButton: {
   background: "transparent",

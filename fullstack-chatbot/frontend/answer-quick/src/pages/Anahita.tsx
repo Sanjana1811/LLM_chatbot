@@ -273,3 +273,103 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export default ChatWith;
+
+
+// Ebony
+// #3d393b
+
+// Orchid
+// #7e1e80
+
+// Purple
+// #9505e3
+
+// // Violet
+// #b637fb
+
+
+// OR
+// primary color scheme: emerald green (Primary Button)
+    // #10B981 - emerald green
+    // #059669 - dark emerald green
+    // #047857 - darker emerald green
+    // #065f46 - darkest emerald green
+
+    // Secondary color scheme: violet purple (Secondary Button)
+    // border : #6EE7B7(mint)
+
+    //Disabled button: gray
+    // #9CA3AF - gray
+    // #6B7280 - dark gray
+    // #4B5563 - darker gray
+    // #374151 - darkest gray
+
+    // background: #D1D5DB - light gray background
+    // text: #9CA3AF - muted gray
+    
+
+
+
+
+
+//     Fresh & Minimal Theme Mapping
+
+// 🔘 Buttons
+// - Primary button:  
+//   - Background: #10B981 (emerald green)  
+//   - Text: White (#FFFFFF)  
+//   - Hover: Darker emerald (#059669)  
+// - Secondary button:  
+//   - Border: #6EE7B7 (mint)  
+//   - Text: #10B981 (emerald)  
+//   - Hover: Mint background with emerald text  
+// - Disabled button:  
+//   - Background: #D1D5DB (light gray)  
+//   - Text: #9CA3AF (muted gray)  
+
+// ---
+
+// 📇 Cards
+// - Background: White (#FFFFFF)  
+// - Border: Subtle mint (#6EE7B7) or light gray (#E5E7EB)  
+// - Title text: Ebony/dark gray (#374151)  
+// - Accent elements (icons, highlights): Amber (#F59E0B)  
+
+// ---
+
+// 🪟 Modals & Pop‑ups
+// - Surface: White (#FFFFFF)  
+// - Header bar: Emerald (#10B981) with white text  
+// - Overlay: Semi‑transparent black (rgba(0,0,0,0.4))  
+// - Close button: Muted gray (#6B7280) hover → amber (#F59E0B)  
+
+// ---
+
+// 🎠 Carousels
+// - Active indicator: Emerald (#10B981)  
+// - Inactive indicator: Muted gray (#9CA3AF)  
+// - Card inside carousel: White background, mint border, amber accent for active state  
+
+// ---
+
+// 🎛 Icons
+// - Default: Dark gray (#374151)  
+// - Active: Emerald (#10B981)  
+// - Alert/notification: Amber (#F59E0B)  
+
+// ---
+
+// 🖋 Typography
+// - Font family: Inter / Roboto / SF Pro  
+// - Sizes:  
+//   - Headings: 20–24px, bold, ebony/dark gray  
+//   - Body text: 16–18px, regular, dark gray  
+//   - Labels/placeholders: 14px, muted gray (#6B7280)  
+
+// ---
+
+// ✨ Design Notes
+// - Emerald is your trustworthy action color → use it for CTAs and headers.  
+// - Mint is your soft secondary → use it for borders, hover states, and subtle highlights.  
+// - Amber is your attention grabber → use sparingly for alerts, badges, or highlights.  
+// - Keep backgrounds light (white or very light gray) so the green tones feel fresh and minimal.

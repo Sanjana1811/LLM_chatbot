@@ -21,3 +21,8 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 npm install lucide-react
 
 
+
+# Routing 
+npm i react-router-dom
+
+

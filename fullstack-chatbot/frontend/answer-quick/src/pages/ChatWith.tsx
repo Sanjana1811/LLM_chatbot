@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ReactMarkdown from "react-markdown";
+import { Link } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import { Send } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -20,6 +21,9 @@ const ChatWith: React.FC = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // 📎 File input ref
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   /* ---------------- LOAD VOICES ---------------- */
   useEffect(() => {
@@ -171,108 +175,149 @@ const ChatWith: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Anahita 💬 AI Assistant</h2>
-      <h6>Your friendly brain on demand</h6>
+    <div> 
+      {/* somewhere in JSX */}
+      <Link to="/feed" style={{ textDecoration: "none" }}>
+        <button style={{ marginBottom: 10 }}>
+          🚀 Open Custom Feed
+        </button>
+      </Link>
+      <div style={styles.container}>
+        <h2>Anahita 💬 AI Assistant</h2>
+        <h6>Your friendly brain on demand</h6>
 
-      <div style={styles.chatBox}>
-        {messages.map(msg => (
-          <div
-            key={msg.id}
-            style={{
-              ...styles.message,
-              alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-              background: msg.role === "user" ? "#DCF8C6" : "#F1F0F0",
-            }}
-          >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}
-              components={{
-                p: ({ children }) => (
-                  <p style={{ margin: "8px 0", lineHeight: "1.6", textAlign: "left" }}>
-                    {children}
-                  </p>
-                ),
-                li: ({ children }) => (
-                  <li style={{ marginBottom: "6px", textAlign: "left" }}>
-                    {children}
-                  </li>
-                ),
-                h1: ({ children }) => (
-                  <h1 style={{ textAlign: "left" }}>{children}</h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 style={{ textAlign: "left" }}>{children}</h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 style={{ textAlign: "left" }}>{children}</h3>
-                ),
+        <div style={styles.chatBox}>
+          {messages.map(msg => (
+            <div
+              key={msg.id}
+              style={{
+                ...styles.message,
+                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                background: msg.role === "user" ? "#DCF8C6" : "#F1F0F0",
               }}
             >
-              {msg.text}
-            </ReactMarkdown>
-
-            <div style={styles.actionRow}>
-              {/* 🔘 SPEAK / STOP TOGGLE */}
-              <button
-                onClick={() => {
-                  if (isSpeaking) stopSpeaking();
-                  else speak(msg.text);
+              <ReactMarkdown remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ children }) => (
+                    <p style={{ margin: "8px 0", lineHeight: "1.6", textAlign: "left" }}>
+                      {children}
+                    </p>
+                  ),
+                  li: ({ children }) => (
+                    <li style={{ marginBottom: "6px", textAlign: "left" }}>
+                      {children}
+                    </li>
+                  ),
+                  h1: ({ children }) => (
+                    <h1 style={{ textAlign: "left" }}>{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 style={{ textAlign: "left" }}>{children}</h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 style={{ textAlign: "left" }}>{children}</h3>
+                  ),
                 }}
-                title={isSpeaking ? "Stop speaking" : "Speak"}
-                style={styles.iconButton}
               >
-                <i
-                  className={`fa-solid ${isSpeaking ? "fa-volume-xmark" : "fa-volume-high"
-                    }`}
-                />
-              </button>
+                {msg.text}
+              </ReactMarkdown>
 
-              <button
-                onClick={() => copyMessage(msg.text)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-copy"></i>
-              </button>
+              <div style={styles.actionRow}>
+                {/* 🔘 SPEAK / STOP TOGGLE */}
+                <button
+                  onClick={() => {
+                    if (isSpeaking) stopSpeaking();
+                    else speak(msg.text);
+                  }}
+                  title={isSpeaking ? "Stop speaking" : "Speak"}
+                  style={styles.iconButton}
+                >
+                  <i
+                    className={`fa-solid ${isSpeaking ? "fa-volume-xmark" : "fa-volume-high"
+                      }`}
+                  />
+                </button>
 
-              <button
-                onClick={() => shareMessage(msg.text)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-share-nodes"></i>
-              </button>
+                <button
+                  onClick={() => copyMessage(msg.text)}
+                  style={styles.iconButton}
+                >
+                  <i className="fa-solid fa-copy"></i>
+                </button>
 
-              <button
-                onClick={() => deleteMessage(msg.id)}
-                style={styles.iconButton}
-              >
-                <i className="fa-solid fa-trash"></i>
-              </button>
+                <button
+                  onClick={() => shareMessage(msg.text)}
+                  style={styles.iconButton}
+                >
+                  <i className="fa-solid fa-share-nodes"></i>
+                </button>
+
+                <button
+                  onClick={() => deleteMessage(msg.id)}
+                  style={styles.iconButton}
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {loading && <div style={styles.typing}>Anahita is thinking…</div>}
-      </div>
+          {loading && <div style={styles.typing}>Anahita is thinking…</div>}
+        </div>
 
-      <div style={styles.inputRow}>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Type your message..."
-          style={styles.input}
-        />
+        <div style={styles.inputRow}>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Type your message..."
+            style={styles.input}
+          />
 
-        <button onClick={startListening} style={styles.iconButton}>
-          <i className="fa-solid fa-microphone"></i>
-        </button>
+          <button onClick={startListening} style={styles.iconButton}>
+            <i className="fa-solid fa-microphone"></i>
+          </button>
 
-        <input type="file" onChange={e => handleFile(e.target.files?.[0])} />
+          {/* 📎 Attach */}
 
-        <button onClick={sendMessage} style={styles.sendButton}>
-          Send <Send size={18} />
-        </button>
+          <button
+
+            onClick={() => fileInputRef.current?.click()}
+
+            style={styles.iconButton}
+
+            title="Attach file"
+
+          >
+
+            <i className="fa-solid fa-paperclip" />
+
+          </button>
+
+
+
+          {/* Hidden file input */}
+
+          <input
+
+            ref={fileInputRef}
+
+            type="file"
+
+            style={{ display: "none" }}
+
+            onChange={e => handleFile(e.target.files?.[0])}
+
+          />
+
+          {/* <input type="file" onChange={e => handleFile(e.target.files?.[0])} /> */}
+
+          <button onClick={sendMessage} style={styles.sendButton}>
+            Send <Send size={16} />
+          </button>
+        </div>
       </div>
     </div>
+
   );
 };
 
@@ -323,8 +368,8 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "10px 16px",
     cursor: "pointer",
     border: "none",
-    background: "#4CAF50",
-    color: "#fff",
+    background: "#b637fb",
+    color: "#ffffff",
     borderRadius: "4px",
   },
   iconButton: {

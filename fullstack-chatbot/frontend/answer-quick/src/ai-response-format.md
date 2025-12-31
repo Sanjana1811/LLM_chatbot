@@ -168,3 +168,13 @@ If you want, I can also explain:
 
 Just say the word 😊
 
+
+
+
+# future scope (subscription)
+<!-- https://chatgpt.com/s/t_6953cb1be4a8819197bfd7ba038b0d7c -->
+<!-- {/* paypal or stripe api for payment processing payment gateway managing*/}
+{/* state of the product, confirm, packed, handed to delivery agent, shipped, delivered */}
+{/* users, admin, charts, event wise sales, charts, price, discount, order and delivery tracking, active order */}
+{/* interface concept, slice and store */} -->
+

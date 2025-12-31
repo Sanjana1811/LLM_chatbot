@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "../../assets/css/customfeed.css";
 
 type FeedItem = {
   title: string;
@@ -44,7 +45,10 @@ const CustomFeed: React.FC = () => {
       <h2>✨ Custom Feed</h2>
       <p>Choose what you want to explore</p>
 
-      <div style={styles.viewport}>
+      <div 
+      // style={styles.viewport}
+      className="custom-feed-viewport"
+      >
         <div style={trackStyles}>
           {feedItems.map((item, index) => (
             <div key={index} style={styles.slide}>
@@ -62,10 +66,15 @@ const CustomFeed: React.FC = () => {
           ))}
         </div>
 
-        <button onClick={prevSlide} style={{ ...styles.navBtn, left: 10 }}>
+        <button onClick={prevSlide} 
+        className='custom-feed-nav-btn-left'
+        // style={{ ...styles.navBtn, left: 10 }}
+        >
           ◀
         </button>
-        <button onClick={nextSlide} style={{ ...styles.navBtn, right: 10 }}>
+        <button onClick={nextSlide} 
+        // style={{ ...styles.navBtn, right: 10 }}
+        className='custom-feed-nav-btn-right'>
           ▶
         </button>
       </div>

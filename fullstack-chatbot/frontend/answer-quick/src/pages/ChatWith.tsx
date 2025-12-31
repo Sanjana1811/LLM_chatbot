@@ -265,7 +265,6 @@ const ChatWith: React.FC = () => {
 
           {loading && <div style={styles.typing}>Anahita is thinking…</div>}
         </div>
-
         <div style={styles.inputRow}>
           <input
             value={input}
